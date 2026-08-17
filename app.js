@@ -1,7 +1,7 @@
 
 import express from "express";
 import cors from "cors";
-// import routes from './routes/index.js';
+import routes from './src/routes/index.js';
 import sequelize from './src/config/database.js';
 
 import './index.js';
@@ -50,8 +50,7 @@ app.use(express.json());
 // Asociamos todas las rutas al path raíz '/'.
 // Las rutas internas definirán sus propios sub-paths, por ejemplo /productos, /usuarios.
 
-
-//------------------------------------------------------------------------------------------------ app.use('/', routes);
+app.use('/', routes);
 
 // El puerto se lee de una variable de entorno o, si no existe, usamos 3000.
 const PUERTO = process.env.PORT || 3000;
@@ -62,7 +61,7 @@ const iniciarServidor = async () => {
         // sequelize.authenticate() solo verifica que se puede conectar a la base de datos.
         // No realiza migraciones ni modifica tablas.
         //  await sequelize.sync( { alter: true } );
-        await sequelize.authenticate();
+        
        await sequelize.authenticate();
 console.log('Conexión a la base de datos establecida correctamente.');
 
