@@ -1,33 +1,33 @@
-import Carrito from '../models/carrito.model.js';
+import ItemCarrito from '../models/itemCarrito.model.js';
 
-// GET /carritos
+// GET /itemsCarrito
 export const obtener = async (req, res) => {
     try {
-        const data = await Carrito.findAll();
+        const data = await ItemCarrito.findAll();
         res.json({
             estado: true,
             data,
         });
     } catch (error) {
-        console.error('Error al obtener carritos:', error);
+        console.error('Error al obtener itemsCarrito:', error);
         res.status(500).json({
             estado: false,
-            mensaje: 'Error al obtener carritos',
+            mensaje: 'Error al obtener itemsCarrito',
             error: error.message,
         });
     }
 };
 
-// GET /carritos/:id
+// GET /itemsCarrito/:id
 export const obtenerPorId = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const data = await Carrito.findByPk(id);
+        const data = await ItemCarrito.findByPk(id);
 
         if (!data) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'Carrito no encontrado',
+                mensaje: 'itemCarrito no encontrado',
             });
         }
 
@@ -36,84 +36,84 @@ export const obtenerPorId = async (req, res) => {
             data,
         });
     } catch (error) {
-        console.error('Error al obtener carrito:', error);
+        console.error('Error al obtener itemCarrito:', error);
         res.status(500).json({
             estado: false,
-            mensaje: 'Error al obtener carrito',
+            mensaje: 'Error al obtener itemCarrito',
             error: error.message,
         });
     }
 };
 
-// POST /carritos
+// POST /itemsCarrito
 export const crear = async (req, res) => {
     try {
-        const data = await Carrito.create(req.body);
+        const data = await ItemCarrito.create(req.body);
         res.status(201).json({
             estado: true,
             data,
         });
     } catch (error) {
-        console.error('Error al crear carrito:', error);
+        console.error('Error al crear itemCarrito:', error);
         res.status(400).json({
             estado: false,
-            mensaje: 'Error al crear carrito',
+            mensaje: 'Error al crear itemCarrito',
             error: error.message,
         });
     }
 };
 
-// PUT /carritos/:id
+// PUT /itemsCarrito/:id
 export const actualizar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const carrito = await Carrito.findByPk(id);
+        const itemCarrito = await ItemCarrito.findByPk(id);
 
-        if (!carrito) {
+        if (!itemCarrito) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'Carrito no encontrado',
+                mensaje: 'itemCarrito no encontrado',
             });
         }
 
-        await carrito.update(req.body);
+        await itemCarrito.update(req.body);
         res.json({
             estado: true,
-            data: carrito,
+            data: itemCarrito,
         });
     } catch (error) {
-        console.error('Error al actualizar carrito:', error);
+        console.error('Error al actualizar itemCarrito:', error);
         res.status(400).json({
             estado: false,
-            mensaje: 'Error al actualizar carrito',
+            mensaje: 'Error al actualizar itemCarrito',
             error: error.message,
         });
     }
 };
 
-// DELETE /categorias/:id
+// DELETE /itemsCarrito/:id
 export const eliminar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const carrito = await Carrito.findByPk(id);
+        const itemCarrito = await ItemCarrito.findByPk(id);
 
-        if (!carrito) {
+        if (!itemCarrito) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'Carrito no encontrada',
+                mensaje: 'ItemCarrito no encontrado',
             });
         }
 
-        await carrito.destroy();
+        await itemCarrito.destroy();
         res.json({
             estado: true,
-            mensaje: 'Carrito eliminado correctamente',
+            mensaje: 'ItemCarrito eliminado correctamente',
         });
     } catch (error) {
-        console.error('Error al eliminar carrito:', error);
+        console.error('Error al eliminar itemCarrito:', error);
         res.status(500).json({
             estado: false,
-            mensaje: 'Error al eliminar carrito',
+            mensaje: 'Error al eliminar itemCarrito',
             error: error.message,
         });
     }

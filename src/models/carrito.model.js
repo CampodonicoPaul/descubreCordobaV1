@@ -12,6 +12,10 @@ const Carrito = sequelize.define('Carrito', {
         fechaCreacion: {
         type: DataTypes.DATE,
         allowNull: false,      
+    },
+    idUsuario: {
+        type: DataTypes.INTEGER,
+        allowNull: true
     }
 },{ 
     tableName: 'carritos',   
