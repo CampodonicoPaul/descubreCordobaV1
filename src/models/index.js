@@ -2,7 +2,7 @@ import sequelize from '../config/database.js';
 
 // Importamos solo los modelos iniciales
 import Usuario from './usuarios.model.js';
-import Categoria from './categorias.model.js';
+import Categoria from './categoria.model.js';
 import Excursion from './excursiones.model.js';
 import UsuarioAdmin from './usuarioAdmin.model.js';
 

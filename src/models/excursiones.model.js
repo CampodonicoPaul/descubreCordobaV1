@@ -26,7 +26,7 @@ const Excursion = sequelize.define('Excursion', {
     duracion: {
         type: DataTypes.STRING,        
     },
-    cupoMaximo: {
+    cupos: {
         type: DataTypes.INTEGER,
     },
     imagenUrl: {

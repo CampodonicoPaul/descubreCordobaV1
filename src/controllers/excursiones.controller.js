@@ -1,4 +1,4 @@
-import Excursion from '../models/excursiones.model.js';
+import Excursion from '../models/index.js';
 
 // GET /excursiones
 export const obtener = async (req, res) => {

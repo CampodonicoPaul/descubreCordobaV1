@@ -1,4 +1,4 @@
-import UsuarioAdmin from '../models/usuarioAdmin.model.js';
+import UsuarioAdmin from '../models/index.js';
 
 // Crear un nuevo administrador
 export const crearUsuarioAdmin = async (req, res) => {
