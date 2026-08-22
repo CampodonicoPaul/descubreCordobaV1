@@ -4,6 +4,7 @@ import sequelize from '../config/database.js';
 import Usuario from './usuarios.model.js';
 import Categoria from './categorias.model.js';
 import Excursion from './excursiones.model.js';
+import UsuarioAdmin from './usuarioAdmin.model.js';
 
 Categoria.hasMany(Excursion, {
     foreignKey: 'categoriaId',
@@ -20,6 +21,7 @@ export {
     Usuario,
     Categoria,
     Excursion,
+    UsuarioAdmin
 };
 
 export default {
@@ -27,4 +29,5 @@ export default {
     Usuario,
     Categoria,
     Excursion,
+    UsuarioAdmin
 };
