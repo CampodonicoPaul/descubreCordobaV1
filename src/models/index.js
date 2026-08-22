@@ -5,6 +5,9 @@ import Usuario from './usuarios.model.js';
 import Categoria from './categoria.model.js';
 import Excursion from './excursiones.model.js';
 import UsuarioAdmin from './usuarioAdmin.model.js';
+import Carrito from "./carrito.model.js"
+import ItemCarrito from "./itemCarrito.model.js"
+
 
 Categoria.hasMany(Excursion, {
     foreignKey: 'categoriaId',
@@ -21,7 +24,9 @@ export {
     Usuario,
     Categoria,
     Excursion,
-    UsuarioAdmin
+    UsuarioAdmin,
+    Carrito,
+    ItemCarrito
 };
 
 export default {
@@ -29,5 +34,7 @@ export default {
     Usuario,
     Categoria,
     Excursion,
-    UsuarioAdmin
+    UsuarioAdmin,
+     Carrito,
+    ItemCarrito
 };
