@@ -1,33 +1,33 @@
-import { Excursion } from '../models/index.js';
+import ItemCarrito from '../models/index.js';
 
-// GET /excursiones
+// GET /itemsCarrito
 export const obtener = async (req, res) => {
     try {
-        const data = await Excursion.findAll();
+        const data = await ItemCarrito.findAll();
         res.json({
             estado: true,
             data,
         });
     } catch (error) {
-        console.error('Error al obtener excursiones:', error);
+        console.error('Error al obtener itemsCarrito:', error);
         res.status(500).json({
             estado: false,
-            mensaje: 'Error al obtener excursiones',
+            mensaje: 'Error al obtener itemsCarrito',
             error: error.message,
         });
     }
 };
 
-// GET /excursiones/:id
+// GET /itemsCarrito/:id
 export const obtenerPorId = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const data = await Excursion.findByPk(id);
+        const data = await ItemCarrito.findByPk(id);
 
         if (!data) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'Excursión no encontrada',
+                mensaje: 'itemCarrito no encontrado',
             });
         }
 
@@ -36,84 +36,84 @@ export const obtenerPorId = async (req, res) => {
             data,
         });
     } catch (error) {
-        console.error('Error al obtener excursión:', error);
+        console.error('Error al obtener itemCarrito:', error);
         res.status(500).json({
             estado: false,
-            mensaje: 'Error al obtener excursión',
+            mensaje: 'Error al obtener itemCarrito',
             error: error.message,
         });
     }
 };
 
-// POST /excursiones
+// POST /itemsCarrito
 export const crear = async (req, res) => {
     try {
-        const data = await Excursion.create(req.body);
+        const data = await ItemCarrito.create(req.body);
         res.status(201).json({
             estado: true,
             data,
         });
     } catch (error) {
-        console.error('Error al crear excursión:', error);
+        console.error('Error al crear itemCarrito:', error);
         res.status(400).json({
             estado: false,
-            mensaje: 'Error al crear excursión',
+            mensaje: 'Error al crear itemCarrito',
             error: error.message,
         });
     }
 };
 
-// PUT /excursiones/:id
+// PUT /itemsCarrito/:id
 export const actualizar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const excursion = await Excursion.findByPk(id);
+        const itemCarrito = await ItemCarrito.findByPk(id);
 
-        if (!excursion) {
+        if (!itemCarrito) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'Excursión no encontrada',
+                mensaje: 'itemCarrito no encontrado',
             });
         }
 
-        await excursion.update(req.body);
+        await itemCarrito.update(req.body);
         res.json({
             estado: true,
-            data: excursion,
+            data: itemCarrito,
         });
     } catch (error) {
-        console.error('Error al actualizar excursión:', error);
+        console.error('Error al actualizar itemCarrito:', error);
         res.status(400).json({
             estado: false,
-            mensaje: 'Error al actualizar excursión',
+            mensaje: 'Error al actualizar itemCarrito',
             error: error.message,
         });
     }
 };
 
-// DELETE /excursiones/:id
+// DELETE /itemsCarrito/:id
 export const eliminar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const excursion = await Excursion.findByPk(id);
+        const itemCarrito = await ItemCarrito.findByPk(id);
 
-        if (!excursion) {
+        if (!itemCarrito) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'Excursión no encontrada',
+                mensaje: 'ItemCarrito no encontrado',
             });
         }
 
-        await excursion.destroy();
+        await itemCarrito.destroy();
         res.json({
             estado: true,
-            mensaje: 'Excursión eliminada correctamente',
+            mensaje: 'ItemCarrito eliminado correctamente',
         });
     } catch (error) {
-        console.error('Error al eliminar excursión:', error);
+        console.error('Error al eliminar itemCarrito:', error);
         res.status(500).json({
             estado: false,
-            mensaje: 'Error al eliminar excursión',
+            mensaje: 'Error al eliminar itemCarrito',
             error: error.message,
         });
     }

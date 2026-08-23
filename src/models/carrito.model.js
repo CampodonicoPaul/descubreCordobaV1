@@ -2,25 +2,24 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
 
-const Categoria = sequelize.define('Categoria', {
+const Carrito = sequelize.define('Carrito', {
     
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,      
         autoIncrement: true,  
     },
-    nombre: {
-        type: DataTypes.STRING,
+    fechaCreacion: {
+        type: DataTypes.DATE,
         allowNull: false,      
-        unique: true,          // No puede haber dos categorías con el mismo nombre.
     },
-    idUsuarioAdmin: {
+    idUsuario: {
         type: DataTypes.INTEGER,
         allowNull: true
     }
 },{ 
-    tableName: 'categorias',   
+    tableName: 'carritos',   
     timestamps: false,         // No agregamos columnas createdAt ni updatedAt.
 });
 
-export default Categoria;
+export default Carrito;

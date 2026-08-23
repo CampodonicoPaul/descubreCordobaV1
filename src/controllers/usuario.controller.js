@@ -1,6 +1,4 @@
-
-
-import Usuario from '../models/usuarios.model.js';
+import { Usuario } from '../models/index.js';
 
 // GET /usuarios -> devuelve todos los usuarios.
 export const obtener = async (req, res) => {

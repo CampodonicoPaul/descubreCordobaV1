@@ -1,44 +1,59 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
-const Excursion = sequelize.define('Excursion', {
-
+const Excursion = sequelize.define(
+  "Excursion",
+  {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,      // PK
-        autoIncrement: true,  
+      type: DataTypes.INTEGER,
+      primaryKey: true, // PK
+      autoIncrement: true,
     },
-    titulo: {
-        type: DataTypes.STRING,
-        allowNull: false,      
+    nombre: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     descripcion: {
-        type: DataTypes.TEXT,
-        allowNull: false,
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
     precio: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    fecha: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     ubicacion: {
-        type: DataTypes.STRING,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     duracion: {
-        type: DataTypes.STRING,        
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    cupoMaximo: {
-        type: DataTypes.INTEGER,
+    cupos: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
-    imagenUrl: {
-        type: DataTypes.STRING,        
+    imagen: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    disponible: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,            
+    idUsuarioAdmin: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
-}, {
-    tableName: 'excursiones',  
-    timestamps: false,         
-});
+    idCategoria: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "excursiones",
+    timestamps: false,
+  },
+);
 
 export default Excursion;

@@ -14,6 +14,7 @@ const UsuarioAdmin = sequelize.define('UsuarioAdmin', {
     },
     apellido: {
         type: DataTypes.STRING(45),
+        allowNull: false,
     },
     email: {
         type: DataTypes.STRING(45),
@@ -25,7 +26,8 @@ const UsuarioAdmin = sequelize.define('UsuarioAdmin', {
         allowNull: false,
     },
     rol: {
-        type: DataTypes.STRING(45), 
+        type: DataTypes.STRING(45),
+        allowNull: true,
     },
 }, {
     tableName: 'usuarios_admin',

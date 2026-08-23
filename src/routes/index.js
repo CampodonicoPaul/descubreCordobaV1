@@ -5,6 +5,8 @@ import excursionesRoutes from './excursiones.routes.js';
 import UsuarioAdminRoutes from './usuarioAdmin.routes.js';
 import comprasRoutes from './compras.routes.js'
 import detallesCompra from './detalleCompra.routes.js'
+import carritoRoutes from "./carrito.routes.js"
+import itemCarrito from './itemCarrito.routes.js';
 
 const router = Router();
 
@@ -15,6 +17,9 @@ router.use('/excursiones', excursionesRoutes);
 router.use('/usuarioAdminRoutes', UsuarioAdminRoutes);
 router.use('/compras', comprasRoutes);
 router.use('/detallescompra', detallesCompra);
+router.use('/usuarioAdmin', UsuarioAdminRoutes);
+router.use('/carrito', carritoRoutes);
+router.use('/itemCarrito', itemCarrito);
 
 
 export default router;

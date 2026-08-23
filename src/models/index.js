@@ -9,6 +9,8 @@ import Compra from './compra.model.js';
 import DetalleCompra from './detalleCompra.model.js';
 
 
+import Carrito from "./carrito.model.js"
+import ItemCarrito from "./itemCarrito.model.js"
 
 
 Categoria.hasMany(Excursion, {
@@ -64,7 +66,9 @@ export {
     Excursion,
     UsuarioAdmin, 
     Compra, 
-    DetalleCompra
+    DetalleCompra,
+    Carrito,
+    ItemCarrito
 };
 
 export default {
@@ -74,5 +78,7 @@ export default {
     Excursion,
     UsuarioAdmin,
     Compra, 
-    DetalleCompra
+    DetalleCompra,
+    Carrito,
+    ItemCarrito
 };

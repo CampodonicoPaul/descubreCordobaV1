@@ -10,6 +10,9 @@ import {
 
 const router = Router();
 
+// Un solo middleware verifica token, tipo, rol y carga el usuario.
+router.use(verificarAdmin)
+
 // Rutas públicas (para la vista principal/e-commerce)
 router.get('/', obtener);
 router.get('/:id', obtenerPorId);
