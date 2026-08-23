@@ -10,6 +10,7 @@ import {
 
 const router = Router();
 
+// Un solo middleware verifica token, tipo, rol y carga el usuario.
 router.use(verificarAdmin)
 
 // Rutas públicas
