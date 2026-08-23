@@ -35,6 +35,6 @@ export default {
     Categoria,
     Excursion,
     UsuarioAdmin,
-     Carrito,
+    Carrito,
     ItemCarrito
 };

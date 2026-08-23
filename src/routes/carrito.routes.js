@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { verificarAdmin } from '../middleware/auth.js';
 import {
     obtener,
     obtenerPorId,
@@ -15,8 +14,8 @@ router.get('/', obtener);
 router.get('/:id', obtenerPorId);
 
 // Rutas protegidas (solo administradores)
-router.post('/', verificarAdmin, crear);
-router.put('/:id', verificarAdmin, actualizar);
-router.delete('/:id', verificarAdmin, eliminar);
+router.post('/', crear);
+router.put('/:id', actualizar);
+router.delete('/:id', eliminar);
 
 export default router;

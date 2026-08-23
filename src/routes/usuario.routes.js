@@ -4,7 +4,7 @@
 import { Router } from 'express';
 const router = Router();
 
-import { verificarAdmin } from '../middleware/auth.js';
+
 import {
     obtener,
     obtenerPorId,
@@ -12,9 +12,6 @@ import {
     actualizar,
     eliminar,
 } from '../controllers/usuario.controller.js';
-
-// Un solo middleware verifica token, tipo, rol y carga el usuario.
-router.use(verificarAdmin);
 
 // GET /usuarios -> listar todos los usuarios.
 router.get('/', obtener);

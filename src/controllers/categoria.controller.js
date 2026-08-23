@@ -1,4 +1,4 @@
-import Categoria from '../models/index.js';
+import { Categoria } from '../models/index.js';
 
 // GET /categorias
 export const obtener = async (req, res) => {

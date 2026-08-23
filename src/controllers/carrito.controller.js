@@ -1,4 +1,4 @@
-import Carrito from '../models/carrito.model.js';
+import { Carrito } from '../models/index.js';
 
 // GET /carritos
 export const obtener = async (req, res) => {
