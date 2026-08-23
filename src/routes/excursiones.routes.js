@@ -10,6 +10,8 @@ import {
 
 const router = Router();
 
+router.use(verificarAdmin)
+
 // Rutas públicas
 router.get('/', obtener);
 router.get('/:id', obtenerPorId);

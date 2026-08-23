@@ -10,6 +10,8 @@ import {
 
 const router = Router();
 
+router.use(verificarAdmin)
+
 // Rutas públicas (para la vista principal/e-commerce)
 router.get('/', obtener);
 router.get('/:id', obtenerPorId);
