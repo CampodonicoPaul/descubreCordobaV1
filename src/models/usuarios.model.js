@@ -23,21 +23,13 @@ const Usuario = sequelize.define('Usuario', {
         allowNull: false,      //obligatorio para iniciar sesión.
         unique: true,          
     },
-    edad: {
-        type: DataTypes.INTEGER,
-    },
-   telefono: {
-        type: DataTypes.STRING,
-    },
-    direccion: {
-        type: DataTypes.STRING,
-    },
-
-    password: {
+    contrasenia: {
         type: DataTypes.STRING,
         allowNull: false,      
-       
     },
+    telefono: {
+        type: DataTypes.STRING,
+    }
 }, {
     tableName: 'usuarios',   
     timestamps: false,       

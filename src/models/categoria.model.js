@@ -14,10 +14,7 @@ const Categoria = sequelize.define('Categoria', {
         allowNull: false,      
         unique: true,          // No puede haber dos categorías con el mismo nombre.
     },
-    descripcion: {
-        type: DataTypes.TEXT,  },
-        
-           idUsuarioAdmin: {
+    idUsuarioAdmin: {
         type: DataTypes.INTEGER,
         allowNull: true
     }

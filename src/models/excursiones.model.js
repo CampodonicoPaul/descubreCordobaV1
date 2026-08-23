@@ -9,7 +9,7 @@ const Excursion = sequelize.define(
       primaryKey: true, // PK
       autoIncrement: true,
     },
-    titulo: {
+    nombre: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -21,27 +21,30 @@ const Excursion = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    fecha: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
     ubicacion: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     duracion: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     cupos: {
       type: DataTypes.INTEGER,
+      allowNull: true,
     },
-    imagenUrl: {
+    imagen: {
       type: DataTypes.STRING,
-    },
-    disponible: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      allowNull: false,
     },
     idUsuarioAdmin: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-
     idCategoria: {
       type: DataTypes.INTEGER,
       allowNull: true,

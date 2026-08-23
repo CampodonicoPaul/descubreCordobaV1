@@ -9,7 +9,7 @@ const Carrito = sequelize.define('Carrito', {
         primaryKey: true,      
         autoIncrement: true,  
     },
-        fechaCreacion: {
+    fechaCreacion: {
         type: DataTypes.DATE,
         allowNull: false,      
     },
