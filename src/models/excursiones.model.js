@@ -38,7 +38,7 @@ const Excursion = sequelize.define(
       allowNull: true,
     },
     imagen: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSON,
       allowNull: false,
     },
     idUsuarioAdmin: {
