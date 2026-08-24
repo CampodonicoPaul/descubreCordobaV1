@@ -1,4 +1,4 @@
-import Compra from '../models/compra.model.js';
+import {Compra} from '../models/index.js';
 
 // GET /compras
 export const obtener = async (req, res) => {

@@ -7,6 +7,7 @@ import comprasRoutes from './compras.routes.js'
 import detallesCompra from './detalleCompra.routes.js'
 import carritoRoutes from "./carrito.routes.js"
 import itemCarrito from './itemCarrito.routes.js';
+import Favorito from '../models/favorito.model.js';
 
 const router = Router();
 
@@ -20,6 +21,7 @@ router.use('/detallescompra', detallesCompra);
 router.use('/usuarioAdmin', UsuarioAdminRoutes);
 router.use('/carrito', carritoRoutes);
 router.use('/itemCarrito', itemCarrito);
+router.use('/favorito', Favorito);
 
 
 export default router;

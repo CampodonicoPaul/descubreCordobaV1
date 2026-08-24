@@ -7,6 +7,7 @@ import Excursion from './excursiones.model.js';
 import UsuarioAdmin from './usuarioAdmin.model.js';
 import Compra from './compra.model.js';
 import DetalleCompra from './detalleCompra.model.js';
+import Favorito from './favorito.model.js';
 
 
 import Carrito from "./carrito.model.js"
@@ -68,7 +69,8 @@ export {
     Compra, 
     DetalleCompra,
     Carrito,
-    ItemCarrito
+    ItemCarrito,
+    Favorito
 };
 
 export default {
@@ -80,5 +82,6 @@ export default {
     Compra, 
     DetalleCompra,
     Carrito,
-    ItemCarrito
+    ItemCarrito,
+    Favorito
 };

@@ -1,4 +1,4 @@
-import DetalleCompra from "../models/detalleCompra.model.js";
+import {DetalleCompra} from "../models/index.js";
 
 // GET /detalleCompras
 export const obtener = async (req, res) => {
