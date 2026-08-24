@@ -7,7 +7,7 @@ import comprasRoutes from './compras.routes.js'
 import detallesCompra from './detalleCompra.routes.js'
 import carritoRoutes from "./carrito.routes.js"
 import itemCarrito from './itemCarrito.routes.js';
-import Favorito from '../models/favorito.model.js';
+import Favorito from './favorito.routes.js';
 
 const router = Router();
 
