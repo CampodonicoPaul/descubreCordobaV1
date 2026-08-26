@@ -1,144 +1,305 @@
 // auth.js contiene los middlewares que protegen las rutas del backend.
-// Verifica que el token JWT sea válido y que el usuario tenga
-// los permisos necesarios para acceder a determinadas rutas.
+// Un middleware se ejecuta antes de llegar al controlador.
+//
+// Usamos un secreto distinto para:
+// - usuarios normales
+// - administradores
 
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../utils/auth.js';
+
+import {
+    JWT_SECRET_CLIENT,
+    JWT_SECRET_ADMIN,
+} from '../utils/auth.js';
+
 import Usuario from '../models/usuarios.model.js';
+import UsuarioAdmin from '../models/usuarioAdmin.model.js';
+
+
+// ==========================================================
+// VERIFICAR TOKEN
+// ==========================================================
 
 /**
  * verificarToken
  *
- * Lee el token JWT enviado en:
+ * Recibe el secreto con el que se debe validar el JWT
+ * y devuelve un middleware.
  *
- * Authorization: Bearer <token>
+ * Ejemplo:
  *
- * Si el token es válido, guarda la información del usuario
- * en req.user y permite continuar con la petición.
+ * verificarToken(JWT_SECRET_CLIENT)
+ *
+ * o
+ *
+ * verificarToken(JWT_SECRET_ADMIN)
  */
-export const verificarToken = (req, res, next) => {
-    try {
-        const authHeader = req.headers.authorization;
+export const verificarToken = (secret) => (req, res, next) => {
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    try {
+
+        // El token llega así:
+        //
+        // Authorization: Bearer TOKEN
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
             return res.status(401).json({
                 estado: false,
-                mensaje: 'No se proporcionó un token de autenticación',
+                mensaje:
+                    'No se proporcionó un token de autenticación',
             });
         }
 
-        // Obtenemos únicamente el token.
-        const token = authHeader.split(' ')[1];
 
-        // Verificamos que el token sea válido.
-        const payload = jwt.verify(token, JWT_SECRET);
+        // Separamos:
+        //
+        // Bearer eyJ...
+        //
+        // y nos quedamos con:
+        //
+        // eyJ...
+        const token =
+            authHeader.split(' ')[1];
 
-        // Guardamos los datos del usuario.
+
+        // Validamos:
+        // - firma
+        // - secreto correcto
+        // - vencimiento
+        const payload =
+            jwt.verify(
+                token,
+                secret
+            );
+
+
+        // Guardamos los datos del token.
         req.user = payload;
+
 
         next();
 
     } catch (error) {
+
         return res.status(401).json({
             estado: false,
-            mensaje: 'Token inválido o expirado',
+            mensaje:
+                'Token inválido o expirado',
             error: error.message,
         });
     }
 };
 
+
+// ==========================================================
+// VERIFICAR USUARIO
+// ==========================================================
 
 /**
  * verificarUsuario
  *
- * Middleware para rutas que requieren que el usuario
- * esté autenticado.
+ * Se usa para las rutas de usuarios normales.
  *
- * Además del token, buscamos al usuario en la base de datos.
+ * 1. Verifica JWT con JWT_SECRET_CLIENT
+ * 2. Comprueba que tipo sea "usuario"
+ * 3. Busca al usuario en la base de datos
+ * 4. Lo guarda en req.usuario
  */
-export const verificarUsuario = async (req, res, next) => {
-    try {
+export const verificarUsuario = (
+    req,
+    res,
+    next
+) => {
 
-        if (!req.user || !req.user.id) {
-            return res.status(401).json({
-                estado: false,
-                mensaje: 'Usuario no autenticado',
-            });
+    // Igual que el profesor,
+    // reutilizamos verificarToken.
+    verificarToken(
+        JWT_SECRET_CLIENT
+    )(
+        req,
+        res,
+        async (err) => {
+
+            if (err) {
+                return next(err);
+            }
+
+            try {
+
+                // En auth.controller.js ustedes generan:
+                //
+                // tipo: 'usuario'
+                if (
+                    !req.user ||
+                    req.user.tipo !== 'usuario'
+                ) {
+
+                    return res.status(403).json({
+                        estado: false,
+                        mensaje:
+                            'Acceso restringido para usuarios',
+                    });
+                }
+
+
+                // Buscamos al usuario utilizando
+                // el id que vino dentro del JWT.
+                const usuario =
+                    await Usuario.findByPk(
+                        req.user.id
+                    );
+
+
+                if (!usuario) {
+
+                    return res.status(403).json({
+                        estado: false,
+                        mensaje:
+                            'Usuario no encontrado',
+                    });
+                }
+
+
+                // Dejamos disponible el usuario
+                // para el controller.
+                //
+                // Ejemplo:
+                //
+                // const usuario = req.usuario;
+                req.usuario = usuario;
+
+
+                next();
+
+            } catch (error) {
+
+                console.error(
+                    'Error en verificarUsuario:',
+                    error
+                );
+
+
+                return res.status(500).json({
+                    estado: false,
+                    mensaje:
+                        'Error al verificar usuario',
+                    error: error.message,
+                });
+            }
         }
-
-        const usuario = await Usuario.findByPk(req.user.id);
-
-        if (!usuario) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: 'Usuario no encontrado',
-            });
-        }
-
-        // Guardamos el usuario encontrado.
-        req.usuario = usuario;
-
-        next();
-
-    } catch (error) {
-        console.error('Error en verificarUsuario:', error);
-
-        return res.status(500).json({
-            estado: false,
-            mensaje: 'Error al verificar usuario',
-            error: error.message,
-        });
-    }
+    );
 };
 
+
+// ==========================================================
+// VERIFICAR ADMIN
+// ==========================================================
 
 /**
  * verificarAdmin
  *
- * Middleware para rutas que solamente pueden utilizar
- * los administradores.
+ * Se usa solamente para rutas de administradores.
  *
- * Primero verifica que exista un usuario autenticado
- * y después comprueba su rol.
+ * 1. Verifica JWT con JWT_SECRET_ADMIN
+ * 2. Comprueba tipo "admin"
+ * 3. Busca al administrador
+ * 4. Comprueba su rol
  */
-export const verificarAdmin = async (req, res, next) => {
-    try {
+export const verificarAdmin = (
+    req,
+    res,
+    next
+) => {
 
-        if (!req.user || !req.user.id) {
-            return res.status(401).json({
-                estado: false,
-                mensaje: 'Usuario no autenticado',
-            });
+    verificarToken(
+        JWT_SECRET_ADMIN
+    )(
+        req,
+        res,
+        async (err) => {
+
+            if (err) {
+                return next(err);
+            }
+
+            try {
+
+                // El token del administrador
+                // se crea con tipo: 'admin'.
+                if (
+                    !req.user ||
+                    req.user.tipo !== 'admin'
+                ) {
+
+                    return res.status(403).json({
+                        estado: false,
+                        mensaje:
+                            'Acceso solo para administradores',
+                    });
+                }
+
+
+                // En su proyecto el administrador
+                // está en un modelo separado.
+                const usuarioAdmin =
+                    await UsuarioAdmin.findByPk(
+                        req.user.id
+                    );
+
+
+                if (!usuarioAdmin) {
+
+                    return res.status(403).json({
+                        estado: false,
+                        mensaje:
+                            'Administrador no encontrado',
+                    });
+                }
+
+
+                // Comprobamos el campo rol
+                // del modelo UsuarioAdmin.
+                if (
+                    usuarioAdmin.rol !== 'admin' &&
+                    usuarioAdmin.rol !== 'administrador'
+                ) {
+
+                    return res.status(403).json({
+                        estado: false,
+                        mensaje:
+                            'El usuario no tiene permisos de administrador',
+                    });
+                }
+
+
+                req.usuarioAdmin =
+                    usuarioAdmin;
+
+
+                next();
+
+            } catch (error) {
+
+                console.error(
+                    'Error en verificarAdmin:',
+                    error
+                );
+
+
+                return res.status(500).json({
+                    estado: false,
+                    mensaje:
+                        'Error al verificar administrador',
+                    error: error.message,
+                });
+            }
         }
-
-        const usuario = await Usuario.findByPk(req.user.id);
-
-        if (!usuario) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: 'Usuario no encontrado',
-            });
-        }
-
-        // Comprobamos el rol del usuario.
-        if (usuario.rol !== 'admin' && usuario.rol !== 'administrador') {
-            return res.status(403).json({
-                estado: false,
-                mensaje: 'Acceso solo para administradores',
-            });
-        }
-
-        req.usuario = usuario;
-
-        next();
-
-    } catch (error) {
-        console.error('Error en verificarAdmin:', error);
-
-        return res.status(500).json({
-            estado: false,
-            mensaje: 'Error al verificar administrador',
-            error: error.message,
-        });
-    }
+    );
 };
