@@ -8,6 +8,7 @@ import detallesCompra from './detalleCompra.routes.js'
 import carritoRoutes from "./carrito.routes.js"
 import itemCarrito from './itemCarrito.routes.js';
 import Favorito from './favorito.routes.js';
+import authRoutes from './auth.routes.js';
 
 const router = Router();
 
@@ -15,13 +16,14 @@ const router = Router();
 router.use('/usuarios', usuariosRoutes);
 router.use('/categorias', categoriasRoutes);
 router.use('/excursiones', excursionesRoutes);
-router.use('/usuarioAdminRoutes', UsuarioAdminRoutes);
+router.use('/usuarioAdmin', UsuarioAdminRoutes);
 router.use('/compras', comprasRoutes);
 router.use('/detallescompra', detallesCompra);
 router.use('/usuarioAdmin', UsuarioAdminRoutes);
 router.use('/carrito', carritoRoutes);
 router.use('/itemCarrito', itemCarrito);
 router.use('/favorito', Favorito);
+router.use('/auth', authRoutes)
 
 
 export default router;

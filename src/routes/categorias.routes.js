@@ -11,15 +11,15 @@ import {
 const router = Router();
 
 // Un solo middleware verifica token, tipo, rol y carga el usuario.
-router.use(verificarAdmin)
+// router.use(verificarAdmin)
 
 // Rutas públicas (para la vista principal/e-commerce)
 router.get('/', obtener);
 router.get('/:id', obtenerPorId);
 
 // Rutas protegidas (solo administradores)
-router.post('/', verificarAdmin, crear);
-router.put('/:id', verificarAdmin, actualizar);
-router.delete('/:id', verificarAdmin, eliminar);
+router.post('/',crear);
+router.put('/:id',actualizar);
+router.delete('/:id',eliminar);
 
 export default router;
