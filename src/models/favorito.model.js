@@ -10,12 +10,12 @@ const Favorito = sequelize.define('Favorito', {
     },
     idUsuario: {
         type: DataTypes.INTEGER,
-       allowNull : true
+       allowNull : false
         
     },
     idExcursion: {
         type: DataTypes.INTEGER,
-        allowNull:true      
+        allowNull:false      
     }
 }, { 
     tableName: 'favorito',   

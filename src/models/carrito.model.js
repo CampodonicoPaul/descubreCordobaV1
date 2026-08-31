@@ -15,7 +15,7 @@ const Carrito = sequelize.define('Carrito', {
     },
     idUsuario: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: false
     }
 },{ 
     tableName: 'carritos',   

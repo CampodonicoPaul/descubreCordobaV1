@@ -18,11 +18,11 @@ const itemCarrito = sequelize.define('itemCarrito', {
     },
     idCarrito: {
         type: DataTypes.INTEGER, 
-        allowNull: true,       
+        allowNull: false,       
     },
     idExcursion: {
         type: DataTypes.INTEGER,
-        allowNull: true,           
+        allowNull: false,           
     },
 }, {
     tableName: 'itemscarrito',
