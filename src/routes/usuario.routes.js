@@ -13,19 +13,26 @@ import {
     eliminar,
 } from '../controllers/usuario.controller.js';
 
+import { verificarAdmin } from '../middleware/auth.js';
+
 // GET /usuarios -> listar todos los usuarios.
-router.get('/', obtener);
+// Solo administradores.
+router.get('/', verificarAdmin, obtener);
 
 // GET /usuarios/:id -> ver un usuario específico.
-router.get('/:id', obtenerPorId);
+// Solo administradores.
+router.get('/:id', verificarAdmin, obtenerPorId);
 
 // POST /usuarios -> crear un nuevo usuario.
-router.post('/', crear);
+// Solo administradores.
+router.post('/', verificarAdmin, crear);
 
 // PUT /usuarios/:id -> actualizar un usuario existente.
-router.put('/:id', actualizar);
+// Solo administradores.
+router.put('/:id', verificarAdmin, actualizar);
 
 // DELETE /usuarios/:id -> eliminar un usuario.
-router.delete('/:id', eliminar);
+// Solo administradores.
+router.delete('/:id', verificarAdmin, eliminar);
 
 export default router;
