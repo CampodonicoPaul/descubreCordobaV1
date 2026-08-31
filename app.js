@@ -60,7 +60,7 @@ const iniciarServidor = async () => {
     try {
         // sequelize.authenticate() solo verifica que se puede conectar a la base de datos.
         // No realiza migraciones ni modifica tablas.
-// //   await sequelize.sync( { force: true } );
+        // await sequelize.sync( { force: true } );
         
        await sequelize.authenticate();
 console.log('Conexión a la base de datos establecida correctamente.');

@@ -5,14 +5,22 @@ import Usuario from './usuarios.model.js';
 import Categoria from './categoria.model.js';
 import Excursion from './excursiones.model.js';
 import UsuarioAdmin from './usuarioAdmin.model.js';
+import Rol from './roles.model.js'
 import Compra from './compra.model.js';
 import DetalleCompra from './detalleCompra.model.js';
+import Carrito from "./carrito.model.js"
+import ItemCarrito from "./itemCarrito.model.js"
 import Favorito from './favorito.model.js';
 
 
-import Carrito from "./carrito.model.js"
-import ItemCarrito from "./itemCarrito.model.js"
-
+Rol.hasMany(Usuario, {
+    foreignKey: 'rolId',
+    as: 'UsuarioAdmin',       // alias para acceder a los usuarios de un rol
+});
+UsuarioAdmin.belongsTo(Rol, {
+    foreignKey: 'idRol',
+    as: 'rol',            // alias para acceder al rol de un usuario
+});
 
 Categoria.hasMany(Excursion, {
     foreignKey: 'categoriaId',
@@ -65,7 +73,8 @@ export {
     Usuario,
     Categoria,
     Excursion,
-    UsuarioAdmin, 
+    UsuarioAdmin,
+    Rol,
     Compra, 
     DetalleCompra,
     Carrito,
@@ -79,6 +88,7 @@ export default {
     Categoria,
     Excursion,
     UsuarioAdmin,
+    Rol,
     Compra, 
     DetalleCompra,
     Carrito,

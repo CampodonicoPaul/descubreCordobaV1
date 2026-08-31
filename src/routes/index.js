@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import statusRoutes from './statusRoutes.js'
 import usuariosRoutes from './usuario.routes.js';
 import categoriasRoutes from './categorias.routes.js';
 import excursionesRoutes from './excursiones.routes.js';
@@ -13,6 +14,7 @@ import authRoutes from './auth.routes.js';
 const router = Router();
 
 // Registro de cada módulo con su prefijo
+router.use('/estado', statusRoutes);
 router.use('/usuarios', usuariosRoutes);
 router.use('/categorias', categoriasRoutes);
 router.use('/excursiones', excursionesRoutes);
@@ -23,7 +25,7 @@ router.use('/usuarioAdmin', UsuarioAdminRoutes);
 router.use('/carrito', carritoRoutes);
 router.use('/itemCarrito', itemCarrito);
 router.use('/favorito', Favorito);
-router.use('/auth', authRoutes)
+router.use('/auth', authRoutes);
 
 
 export default router;

@@ -1,111 +1,276 @@
 import {UsuarioAdmin} from '../models/index.js';
+import Rol from '../models/roles.model.js';
 
-// Crear un nuevo administrador
-export const crearUsuarioAdmin = async (req, res) => {
+/**
+ * listarAdministradores
+ * Devuelve todos los usuarios con sus roles.
+ * Accesible para ADMIN y OPERADOR.
+ */
+export const listarAdministradores = async (req, res) => {
     try {
+        const data = await UsuarioAdmin.findAll({
+            include: {
+                model: Rol,
+                as: 'rol',
+            },
+            attributes: { exclude: ['contrasenia'] },
+            order: [['id', 'ASC']],
+        });
 
-         console.log("ENTRÓ AL POST");
-        console.log(req.body);
-        const { nombre, apellido, email, contrasenia, rol } = req.body;
+        res.json({
+            estado: true,
+            data,
+        });
+    } catch (error) {
+        console.error('Error al listar administradores:', error);
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al listar administradores',
+            error: error.message,
+        });
+    }
+};
 
-        const nuevoAdmin = await UsuarioAdmin.create({
+/**
+ * obtenerAdministradorPorId
+ * Devuelve un usuario administrador por su id.
+ * Accesible para ADMIN y OPERADOR.
+ */
+export const obtenerAdministradorPorId = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+
+        const usuario = await UsuarioAdmin.findByPk(id, {
+            include: {
+                model: Rol,
+                as: 'rol',
+            },
+            attributes: { exclude: ['contrasenia'] },
+        });
+
+        if (!usuario) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: 'Usuario no encontrado',
+            });
+        }
+
+        res.json({
+            estado: true,
+            data: usuario,
+        });
+    } catch (error) {
+        console.error('Error al obtener administrador:', error);
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al obtener administrador',
+            error: error.message,
+        });
+    }
+};
+
+
+
+/**
+ * crearAdministrador
+ * Crea un nuevo usuario con rol de administración.
+ * Solo accesible para ADMIN.
+ */
+export const crearAdministrador = async (req, res) => {
+    try {
+        const { nombre, apellido, email, contrasenia, idRol } = req.body;
+
+        if (!nombre || !email || !contrasenia || !idRol) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'Debe proporcionar nombre, email, contraseña y idRol',
+            });
+        }
+
+        // Verificamos que el rol exista y sea ADMIN u OPERADOR.
+        // Así evitamos asignar roles ajenos al panel de administración.
+        const rol = await Rol.findByPk(idRol);
+        if (!rol || !['ADMIN', 'OPERADOR'].includes(rol.nombre.toUpperCase())) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El rol seleccionado no es válido para un usuario administrativo',
+            });
+        }
+
+        // Verificamos que el email no esté registrado.
+        // El modelo también tiene unique, pero validamos antes para un mensaje claro.
+        const existe = await Usuario.findOne({ where: { email } });
+        if (existe) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El email ya está registrado',
+            });
+        }
+
+        const data = await UsuarioAdmin.create({
             nombre,
             apellido,
             email,
-            contrasenia, // El hook beforeCreate se encarga de encriptarla
-            rol
+            contrasenia,
+            idRol,
         });
 
-        // Ocultar la contraseña en la respuesta
-        const adminResponse = nuevoAdmin.toJSON();
-        delete adminResponse.contrasenia;
-
-        return res.status(201).json(adminResponse);
-} catch (error) {
-    console.log("ERROR REAL:", error);
-    return res.status(500).json({
-        mensaje: 'Error al crear el usuario',
-        error: error.message
-    });
-}
-};
-
-// Obtener todos los administradores
-export const obtenerUsuariosAdmin = async (req, res) => {
-    try {
-        const usuarios = await UsuarioAdmin.findAll({
-            attributes: { exclude: ['contrasenia'] }
+        res.status(201).json({
+            estado: true,
+            mensaje: 'Usuario administrativo creado correctamente',
+            data: await UsuarioAdmin.findByPk(data.id, {
+                include: { model: Rol, as: 'rol' },
+                attributes: { exclude: ['contrasenia'] },
+            }),
         });
-        return res.status(200).json(usuarios);
     } catch (error) {
-        return res.status(500).json({ mensaje: 'Error al obtener usuarios', error: error.message });
+        console.error('Error al crear administrador:', error);
+        res.status(400).json({
+            estado: false,
+            mensaje: 'Error al crear administrador',
+            error: error.message,
+        });
     }
 };
 
-// Obtener un administrador por ID
-export const obtenerUsuarioAdminPorId = async (req, res) => {
+/**
+ * actualizarAdministrador
+ * Actualiza los datos de un usuario administrativo.
+ * Solo accesible para ADMIN.
+ */
+export const actualizarAdministrador = async (req, res) => {
     try {
-        const { id } = req.params;
-        const admin = await UsuarioAdmin.findByPk(id, {
-            attributes: { exclude: ['contrasenia'] }
+        const id = parseInt(req.params.id, 10);
+        const usuario = await UsuarioAdmin.findByPk(id);
+
+        if (!usuario) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: 'Usuario no encontrado',
+            });
+        }
+
+        const { nombre, apellido, email, contrasenia, idRol } = req.body;
+
+        if (email && email !== usuario.email) {
+            const existeEmail = await UsuarioAdmin.findOne({ where: { email } });
+            if (existeEmail && existeEmail.id !== id) {
+                return res.status(400).json({
+                    estado: false,
+                    mensaje: 'El email ya se encuentra registrado por otro usuario',
+                });
+            }
+        }
+
+        if (idRol) {
+            const rol = await Rol.findByPk(idRol);
+            if (!rol || !['ADMIN', 'OPERADOR'].includes(rol.nombre.toUpperCase())) {
+                return res.status(400).json({
+                    estado: false,
+                    mensaje: 'El rol seleccionado no es válido para un usuario administrativo',
+                });
+            }
+        }
+
+        // Construimos un objeto solo con los campos enviados.
+        // Así no sobrescribimos valores con undefined.
+        const campos = {};
+        if (nombre !== undefined) campos.nombre = nombre;
+        if (apellido !== undefined) campos.apellido = apellido;
+        if (email !== undefined) campos.email = email;
+        if (idRol !== undefined) campos.idRol = idRol;
+        if (contrasenia && contrasenia.trim() !== '') {
+            campos.contrasenia = contrasenia; // El hook beforeUpdate de Sequelize encripta automáticamente
+        }
+
+        await usuario.update(campos);
+
+        res.json({
+            estado: true,
+            mensaje: 'Usuario administrativo actualizado correctamente',
+            data: await UsuarioAdmin.findByPk(usuario.id, {
+                include: { model: Rol, as: 'rol' },
+                attributes: { exclude: ['contrasenia'] },
+            }),
+        });
+    } catch (error) {
+        console.error('Error al actualizar administrador:', error);
+        res.status(400).json({
+            estado: false,
+            mensaje: 'Error al actualizar administrador',
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * eliminarAdministrador
+ * Elimina un usuario administrativo.
+ * Solo accesible para ADMIN.
+ * Un administrador no puede eliminarse a sí mismo.
+ */
+export const eliminarAdministrador = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+
+        // Impedimos que un administrador se elimine a sí mismo,
+        // evitando quedar sin acceso al panel.
+        if (req.usuario.id === id) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'No podés eliminar tu propio usuario',
+            });
+        }
+
+        const usuario = await UsuarioAdmin.findByPk(id);
+
+        if (!usuario) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: 'Usuario no encontrado',
+            });
+        }
+
+        await usuario.destroy();
+
+        res.json({
+            estado: true,
+            mensaje: 'Usuario administrativo eliminado correctamente',
+        });
+    } catch (error) {
+        console.error('Error al eliminar administrador:', error);
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al eliminar administrador',
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * listarRoles
+ * Devuelve los roles ADMIN y OPERADOR disponibles para asignar.
+ * Solo accesible para ADMIN.
+ */
+export const listarRoles = async (req, res) => {
+    try {
+        const data = await Rol.findAll({
+            where: {
+                nombre: ['ADMIN', 'OPERADOR'],
+            },
+            order: [['nombre', 'ASC']],
         });
 
-        if (!admin) {
-            return res.status(404).json({ mensaje: 'Usuario administrador no encontrado' });
-        }
-
-        return res.status(200).json(admin);
+        res.json({
+            estado: true,
+            data,
+        });
     } catch (error) {
-        return res.status(500).json({ mensaje: 'Error al obtener el usuario', error: error.message });
-    }
-};
-
-// Actualizar un administrador
-export const actualizarUsuarioAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { nombre, apellido, email, contrasenia, rol } = req.body;
-
-        const admin = await UsuarioAdmin.findByPk(id);
-
-        if (!admin) {
-            return res.status(404).json({ mensaje: 'Usuario administrador no encontrado' });
-        }
-
-        // Asignamos cambios campo por campo para que Sequelize detecte cambios en 'contrasenia'
-        if (nombre !== undefined) admin.nombre = nombre;
-        if (apellido !== undefined) admin.apellido = apellido;
-        if (email !== undefined) admin.email = email;
-        if (contrasenia !== undefined) admin.contrasenia = contrasenia; // El hook beforeUpdate se ejecutará al llamar save()
-        if (rol !== undefined) admin.rol = rol;
-
-        await admin.save();
-
-        const adminResponse = admin.toJSON();
-        delete adminResponse.contrasenia;
-
-        return res.status(200).json(adminResponse);
-    } catch (error) {
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(400).json({ mensaje: 'El email ya está registrado por otro usuario' });
-        }
-        return res.status(500).json({ mensaje: 'Error al actualizar el usuario', error: error.message });
-    }
-};
-
-// Eliminar un administrador
-export const eliminarUsuarioAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const admin = await UsuarioAdmin.findByPk(id);
-
-        if (!admin) {
-            return res.status(404).json({ mensaje: 'Usuario administrador no encontrado' });
-        }
-
-        await admin.destroy();
-        return res.status(200).json({ mensaje: 'Usuario administrador eliminado correctamente' });
-    } catch (error) {
-        return res.status(500).json({ mensaje: 'Error al eliminar el usuario', error: error.message });
+        console.error('Error al listar roles:', error);
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al listar roles',
+            error: error.message,
+        });
     }
 };

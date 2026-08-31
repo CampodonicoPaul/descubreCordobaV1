@@ -14,6 +14,7 @@ import {
 
 import Usuario from '../models/usuarios.model.js';
 import UsuarioAdmin from '../models/usuarioAdmin.model.js';
+import Rol from '../models/roles.model.js';
 
 
 // ==========================================================
@@ -250,33 +251,32 @@ export const verificarAdmin = (
                 // está en un modelo separado.
                 const usuarioAdmin =
                     await UsuarioAdmin.findByPk(
-                        req.user.id
-                    );
+                        req.user.id, {
+                include: {
+                    model: Rol,
+                    as: 'rol',
+                },
+            });
 
 
-                if (!usuarioAdmin) {
-
-                    return res.status(403).json({
-                        estado: false,
-                        mensaje:
-                            'Administrador no encontrado',
-                    });
-                }
+                if (!usuarioAdmin || !usuarioAdmin.rol) {
+                return res.status(403).json({
+                    estado: false,
+                    mensaje: 'Usuario o rol no encontrado',
+                });
+            }
 
 
-                // Comprobamos el campo rol
-                // del modelo UsuarioAdmin.
-                if (
-                    usuarioAdmin.rol !== 'admin' &&
-                    usuarioAdmin.rol !== 'administrador'
-                ) {
-
-                    return res.status(403).json({
-                        estado: false,
-                        mensaje:
-                            'El usuario no tiene permisos de administrador',
-                    });
-                }
+            // Permitimos tanto ADMIN como OPERADOR. Si el rol no está
+            // en esta lista, el token era válido pero el usuario no tiene
+            // acceso al panel de administración.
+            const rol = usuarioAdmin.rol.nombre.toUpperCase();
+            if (!['ADMIN', 'OPERADOR'].includes(rol)) {
+                return res.status(403).json({
+                    estado: false,
+                    mensaje: 'El usuario no tiene permisos de administrador',
+                });
+            }
 
 
                 req.usuarioAdmin =
@@ -302,4 +302,24 @@ export const verificarAdmin = (
             }
         }
     );
+};
+
+export const verificarRolAdmin = (req, res, next) => {
+    if (!req.usuarioAdmin || !req.usuarioAdmin.rol) {
+        return res.status(403).json({
+            estado: false,
+            mensaje: 'No se pudo verificar el rol del usuario',
+        });
+    }
+
+    // Comparamos en mayúsculas para evitar problemas de mayúsculas/minúsculas.
+    const rol = req.usuarioAdmin.rol.nombre.toUpperCase();
+    if (rol !== 'ADMIN') {
+        return res.status(403).json({
+            estado: false,
+            mensaje: 'Esta acción requiere permisos de ADMIN',
+        });
+    }
+
+    next();
 };
