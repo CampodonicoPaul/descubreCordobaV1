@@ -23,11 +23,11 @@ UsuarioAdmin.belongsTo(Rol, {
 });
 
 Categoria.hasMany(Excursion, {
-    foreignKey: 'categoriaId',
+    foreignKey: 'idCategoria',
     as: 'excursiones',
 });
 Excursion.belongsTo(Categoria, {
-    foreignKey: 'categoriaId',
+    foreignKey: 'idCategoria',
     as: 'categoria',
 });
 
