@@ -28,7 +28,6 @@ const app = express();
 
 // Versión simple con un vector (array) de orígenes permitidos.
 const allowedOrigins = [
-    'https://miszapatos.com',
     'http://localhost:5173',
     'http://localhost:5174',
 ];

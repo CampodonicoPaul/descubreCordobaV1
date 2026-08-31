@@ -65,6 +65,80 @@ DetalleCompra.belongsTo(Excursion, {
   as: 'excursion'
 })
 
+// ===============================
+// RELACIONES DEL CARRITO
+// ===============================
+
+// Un Usuario puede tener muchos Carritos
+Usuario.hasMany(Carrito, {
+  foreignKey: 'idUsuario',
+  as: 'carritos',
+});
+
+// Un Carrito pertenece a un Usuario
+Carrito.belongsTo(Usuario, {
+  foreignKey: 'idUsuario',
+  as: 'usuario',
+});
+
+
+// ===============================
+// RELACIONES DE LOS ITEMS DEL CARRITO
+// ===============================
+
+// Un Carrito tiene muchos Items
+Carrito.hasMany(ItemCarrito, {
+  foreignKey: 'idCarrito',
+  as: 'items',
+});
+
+// Un ItemCarrito pertenece a un Carrito
+ItemCarrito.belongsTo(Carrito, {
+  foreignKey: 'idCarrito',
+  as: 'carrito',
+});
+
+// Una Excursion puede estar en muchos ItemsCarrito
+Excursion.hasMany(ItemCarrito, {
+  foreignKey: 'idExcursion',
+  as: 'itemsCarrito',
+});
+
+// Un ItemCarrito pertenece a una Excursion
+ItemCarrito.belongsTo(Excursion, {
+  foreignKey: 'idExcursion',
+  as: 'excursion',
+});
+
+
+// ===============================
+// RELACIONES DE FAVORITOS
+// ===============================
+
+// Un Usuario puede tener muchos Favoritos
+Usuario.hasMany(Favorito, {
+  foreignKey: 'idUsuario',
+  as: 'favoritos',
+});
+
+// Un Favorito pertenece a un Usuario
+Favorito.belongsTo(Usuario, {
+  foreignKey: 'idUsuario',
+  as: 'usuario',
+});
+
+// Una Excursion puede ser favorita de muchos usuarios
+Excursion.hasMany(Favorito, {
+  foreignKey: 'idExcursion',
+  as: 'favoritos',
+});
+
+// Un Favorito pertenece a una Excursion
+Favorito.belongsTo(Excursion, {
+  foreignKey: 'idExcursion',
+  as: 'excursion',
+});
+
 
 
 // Exportamos solo los modelos activos
