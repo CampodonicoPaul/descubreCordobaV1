@@ -82,6 +82,14 @@ export const crear = async (req, res) => {
     try {
         const { idCarrito, idExcursion, cantidad } = req.body;
 
+        // Verificamos que la cantidad sea válida.
+        if (!Number.isInteger(Number(cantidad)) || Number(cantidad) <= 0) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'La cantidad debe ser un número entero mayor a 0',
+            });
+        }
+
         // Verificamos que el carrito pertenezca al usuario autenticado.
         const carrito = await Carrito.findOne({
             where: {
@@ -107,7 +115,37 @@ export const crear = async (req, res) => {
             });
         }
 
-        const subtotal = Number(excursion.precio) * Number(cantidad);
+        // Verificamos si la excursión ya existe en el carrito.
+        const itemExistente = await ItemCarrito.findOne({
+            where: {
+                idCarrito,
+                idExcursion,
+            },
+        });
+
+        if (itemExistente) {
+            // Si ya existe, aumentamos la cantidad.
+            const nuevaCantidad =
+                Number(itemExistente.cantidad) + Number(cantidad);
+
+            const subtotal =
+                Number(excursion.precio) * nuevaCantidad;
+
+            await itemExistente.update({
+                cantidad: nuevaCantidad,
+                subtotal,
+            });
+
+            return res.json({
+                estado: true,
+                mensaje: 'Cantidad actualizada en el carrito',
+                data: itemExistente,
+            });
+        }
+
+        // Si no existe, creamos un nuevo item.
+        const subtotal =
+            Number(excursion.precio) * Number(cantidad);
 
         const data = await ItemCarrito.create({
             idCarrito,

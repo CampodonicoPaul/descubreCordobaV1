@@ -27,6 +27,15 @@ const itemCarrito = sequelize.define('itemCarrito', {
 }, {
     tableName: 'itemscarrito',
     timestamps: false,         
-});
+},
+{
+indexes: [
+    {
+        unique: true,
+        fields: ['idCarrito', 'idExcursion'],
+    },
+],
+}
+);
 
 export default itemCarrito;
