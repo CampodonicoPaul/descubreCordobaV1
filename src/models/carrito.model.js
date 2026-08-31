@@ -16,6 +16,11 @@ const Carrito = sequelize.define('Carrito', {
     idUsuario: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    estado: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'ACTIVO',
     }
 },{ 
     tableName: 'carritos',   
