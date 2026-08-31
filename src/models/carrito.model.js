@@ -13,15 +13,15 @@ const Carrito = sequelize.define('Carrito', {
         type: DataTypes.DATE,
         allowNull: false,      
     },
+    estado: {
+    type: DataTypes.ENUM('ACTIVO', 'COMPRADO'),
+    allowNull: false,
+    defaultValue: 'ACTIVO',
+    },
     idUsuario: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    estado: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'ACTIVO',
-    }
 },{ 
     tableName: 'carritos',   
     timestamps: false,         // No agregamos columnas createdAt ni updatedAt.
