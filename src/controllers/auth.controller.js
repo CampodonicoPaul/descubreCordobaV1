@@ -347,12 +347,12 @@ export const loginAdmin = async (req, res) => {
 /**
  * refreshTokenAdmin
  * Valida el token del administrador y emite uno nuevo con datos actualizados.
- * El middleware verificarAdmin ya cargó al usuario en req.usuario,
+ * El middleware verificarAdmin ya cargó al usuarioAdmin en req.usuarioAdmin,
  * por lo que podemos confiar en esa información.
  */
 export const refreshTokenAdmin = async (req, res) => {
     try {
-        const usuario = req.usuario;
+        const usuario = req.usuarioAdmin;
 
         const token = generarToken({
             id: usuario.id,
@@ -392,7 +392,7 @@ export const refreshTokenAdmin = async (req, res) => {
  */
 export const obtenerPerfilAdmin = async (req, res) => {
     try {
-        const usuario = await UsuarioAdmin.findByPk(req.usuario.id, {
+        const usuario = await UsuarioAdmin.findByPk(req.usuarioAdmin.id, {
             include: { model: Rol, as: 'rol' },
             attributes: { exclude: ['contrasenia'] },
         });

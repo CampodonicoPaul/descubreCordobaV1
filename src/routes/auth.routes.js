@@ -77,6 +77,7 @@ router.get(
 // Obtener perfil Admin
 router.get(
     '/admin/perfil',
+    verificarAdmin,
     obtenerPerfilAdmin
 );
 
