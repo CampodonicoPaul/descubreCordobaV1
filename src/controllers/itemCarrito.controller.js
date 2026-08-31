@@ -1,15 +1,28 @@
-import {ItemCarrito} from '../models/index.js';
+import { ItemCarrito, Carrito, Excursion } from '../models/index.js';
 
 // GET /itemsCarrito
+// Obtiene solamente los items pertenecientes a carritos del usuario autenticado.
 export const obtener = async (req, res) => {
     try {
-        const data = await ItemCarrito.findAll();
+        const data = await ItemCarrito.findAll({
+            include: [
+                {
+                    model: Carrito,
+                    as: 'carrito',
+                    where: {
+                        idUsuario: req.usuario.id,
+                    },
+                },
+            ],
+        });
+
         res.json({
             estado: true,
             data,
         });
     } catch (error) {
         console.error('Error al obtener itemsCarrito:', error);
+
         res.status(500).json({
             estado: false,
             mensaje: 'Error al obtener itemsCarrito',
@@ -18,16 +31,32 @@ export const obtener = async (req, res) => {
     }
 };
 
+
 // GET /itemsCarrito/:id
+// Obtiene un item solamente si pertenece al usuario autenticado.
 export const obtenerPorId = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const data = await ItemCarrito.findByPk(id);
+
+        const data = await ItemCarrito.findOne({
+            where: {
+                id,
+            },
+            include: [
+                {
+                    model: Carrito,
+                    as: 'carrito',
+                    where: {
+                        idUsuario: req.usuario.id,
+                    },
+                },
+            ],
+        });
 
         if (!data) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'itemCarrito no encontrado',
+                mensaje: 'ItemCarrito no encontrado',
             });
         }
 
@@ -37,6 +66,7 @@ export const obtenerPorId = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al obtener itemCarrito:', error);
+
         res.status(500).json({
             estado: false,
             mensaje: 'Error al obtener itemCarrito',
@@ -45,16 +75,54 @@ export const obtenerPorId = async (req, res) => {
     }
 };
 
+
 // POST /itemsCarrito
+// Crea un item solamente dentro de un carrito perteneciente al usuario.
 export const crear = async (req, res) => {
     try {
-        const data = await ItemCarrito.create(req.body);
+        const { idCarrito, idExcursion, cantidad } = req.body;
+
+        // Verificamos que el carrito pertenezca al usuario autenticado.
+        const carrito = await Carrito.findOne({
+            where: {
+                id: idCarrito,
+                idUsuario: req.usuario.id,
+            },
+        });
+
+        if (!carrito) {
+            return res.status(403).json({
+                estado: false,
+                mensaje: 'No tenés permiso para modificar este carrito',
+            });
+        }
+
+        // Buscamos la excursión para obtener su precio real.
+        const excursion = await Excursion.findByPk(idExcursion);
+
+        if (!excursion) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: 'Excursión no encontrada',
+            });
+        }
+
+        const subtotal = Number(excursion.precio) * Number(cantidad);
+
+        const data = await ItemCarrito.create({
+            idCarrito,
+            idExcursion,
+            cantidad,
+            subtotal,
+        });
+
         res.status(201).json({
             estado: true,
             data,
         });
     } catch (error) {
         console.error('Error al crear itemCarrito:', error);
+
         res.status(400).json({
             estado: false,
             mensaje: 'Error al crear itemCarrito',
@@ -63,26 +131,70 @@ export const crear = async (req, res) => {
     }
 };
 
+
 // PUT /itemsCarrito/:id
+// Actualiza solamente un item perteneciente al usuario autenticado.
 export const actualizar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const itemCarrito = await ItemCarrito.findByPk(id);
+
+        const itemCarrito = await ItemCarrito.findOne({
+            where: {
+                id,
+            },
+            include: [
+                {
+                    model: Carrito,
+                    as: 'carrito',
+                    where: {
+                        idUsuario: req.usuario.id,
+                    },
+                },
+            ],
+        });
 
         if (!itemCarrito) {
             return res.status(404).json({
                 estado: false,
-                mensaje: 'itemCarrito no encontrado',
+                mensaje: 'ItemCarrito no encontrado',
             });
         }
 
-        await itemCarrito.update(req.body);
+        const cantidad = Number(req.body.cantidad);
+
+        if (!Number.isInteger(cantidad) || cantidad <= 0) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'La cantidad debe ser un número entero mayor a 0',
+            });
+        }
+
+        // Buscamos la excursión asociada al item.
+        const excursion = await Excursion.findByPk(
+            itemCarrito.idExcursion
+        );
+
+        if (!excursion) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: 'Excursión no encontrada',
+            });
+        }
+
+        const subtotal = Number(excursion.precio) * cantidad;
+
+        await itemCarrito.update({
+            cantidad,
+            subtotal,
+        });
+
         res.json({
             estado: true,
             data: itemCarrito,
         });
     } catch (error) {
         console.error('Error al actualizar itemCarrito:', error);
+
         res.status(400).json({
             estado: false,
             mensaje: 'Error al actualizar itemCarrito',
@@ -91,11 +203,27 @@ export const actualizar = async (req, res) => {
     }
 };
 
+
 // DELETE /itemsCarrito/:id
+// Elimina solamente un item perteneciente al usuario autenticado.
 export const eliminar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const itemCarrito = await ItemCarrito.findByPk(id);
+
+        const itemCarrito = await ItemCarrito.findOne({
+            where: {
+                id,
+            },
+            include: [
+                {
+                    model: Carrito,
+                    as: 'carrito',
+                    where: {
+                        idUsuario: req.usuario.id,
+                    },
+                },
+            ],
+        });
 
         if (!itemCarrito) {
             return res.status(404).json({
@@ -105,12 +233,14 @@ export const eliminar = async (req, res) => {
         }
 
         await itemCarrito.destroy();
+
         res.json({
             estado: true,
             mensaje: 'ItemCarrito eliminado correctamente',
         });
     } catch (error) {
         console.error('Error al eliminar itemCarrito:', error);
+
         res.status(500).json({
             estado: false,
             mensaje: 'Error al eliminar itemCarrito',
