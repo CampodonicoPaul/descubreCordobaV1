@@ -272,6 +272,7 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
+        // Buscamos el administrador junto con su rol
         const usuarioAdmin = await UsuarioAdmin.findOne({
             where: { email },
             include: {
@@ -280,6 +281,7 @@ export const loginAdmin = async (req, res) => {
             }
         });
 
+        // Verificamos que exista el usuario y tenga un rol
         if (!usuarioAdmin || !usuarioAdmin.rol) {
             return res.status(401).json({
                 estado: false,
@@ -287,13 +289,15 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        if (usuarioAdmin.rol.nombre.toLowerCase() !== 'administrador') {
+        // Verificamos que el rol sea ADMIN
+        if (usuarioAdmin.rol.nombre.toUpperCase() !== 'ADMIN') {
             return res.status(403).json({
                 estado: false,
                 mensaje: 'Acceso solo para administradores',
             });
         }
 
+        // Verificamos la contraseña
         const passwordValido = await compararPassword(
             contrasenia,
             usuarioAdmin.contrasenia
@@ -306,6 +310,7 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
+        // Generamos el JWT
         const token = generarToken({
             id: usuarioAdmin.id,
             email: usuarioAdmin.email,
