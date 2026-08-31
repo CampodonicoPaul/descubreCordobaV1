@@ -3,8 +3,16 @@ import express from "express";
 import cors from "cors";
 import routes from './src/routes/index.js';
 import sequelize from './src/config/database.js';
+import 'dotenv/config';
 
-import './index.js';
+// verificamos que esten cargados los tokens de cliente y administrador
+if (!process.env.JWT_SECRET_ADMIN) {
+    throw new Error('Falta configurar JWT_SECRET_ADMIN en el archivo .env');
+}
+
+if (!process.env.JWT_SECRET_CLIENT) {
+    throw new Error('Falta configurar JWT_SECRET_CLIENT en el archivo .env');
+}
 
 // Creamos la aplicación Express.
 const app = express();

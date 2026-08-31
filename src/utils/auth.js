@@ -22,14 +22,12 @@ const SALT_ROUNDS = 10;
 
 // Token para usuarios/clientes normales.
 export const JWT_SECRET_CLIENT =
-    process.env.JWT_SECRET_CLIENT ||
-    'clave_secreta_usuario_descubre_cordoba';
+    process.env.JWT_SECRET_CLIENT;
 
 
 // Token para administradores.
 export const JWT_SECRET_ADMIN =
-    process.env.JWT_SECRET_ADMIN ||
-    'clave_secreta_admin_descubre_cordoba';
+    process.env.JWT_SECRET_ADMIN;
 
 
 // Dejamos también JWT_SECRET por compatibilidad,

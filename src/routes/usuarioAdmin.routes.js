@@ -21,6 +21,10 @@ import {
     listarRoles,
 } from '../controllers/usuarioAdmin.controller.js';
 
+
+// Roles disponibles para asignar (solo ADMIN puede asignar roles).
+router.get('/roles', verificarAdmin, verificarRolAdmin, listarRoles);
+
 // Rutas de lectura: accesibles para ADMIN y OPERADOR.
 // Operador entra gracias a verificarAdmin y puede ver la lista y el detalle.
 router.get('/', verificarAdmin, listarAdministradores);
@@ -33,7 +37,5 @@ router.post('', verificarAdmin, verificarRolAdmin, crearAdministrador);
 router.put('/:id', verificarAdmin, verificarRolAdmin, actualizarAdministrador);
 router.delete('/:id', verificarAdmin, verificarRolAdmin, eliminarAdministrador);
 
-// Roles disponibles para asignar (solo ADMIN puede asignar roles).
-router.get('/roles', verificarAdmin, verificarRolAdmin, listarRoles);
 
 export default router;

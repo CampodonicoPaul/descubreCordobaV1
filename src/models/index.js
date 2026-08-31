@@ -13,7 +13,7 @@ import ItemCarrito from "./itemCarrito.model.js"
 import Favorito from './favorito.model.js';
 
 
-Rol.hasMany(Usuario, {
+Rol.hasMany(UsuarioAdmin, {
     foreignKey: 'idRol',
     as: 'UsuarioAdmin',       // alias para acceder a los usuarios de un rol
 });

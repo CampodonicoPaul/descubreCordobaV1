@@ -7,9 +7,12 @@ import {
     obtenerPerfilCliente,
     actualizarPerfilCliente,
     loginAdmin,
+    obtenerPerfilAdmin,
+    refreshTokenAdmin,
 } from '../controllers/auth.controller.js';
 
 import {
+    verificarAdmin,
     verificarUsuario,
 } from '../middleware/auth.js';
 
@@ -39,7 +42,7 @@ router.get(
     refreshTokenCliente
 );
 
-// Obtener perfil
+// Obtener perfil cliente
 router.get(
     '/usuario/perfil',
     verificarUsuario,
@@ -62,6 +65,19 @@ router.put(
 router.post(
     '/admin/login',
     loginAdmin
+);
+
+// Renovar token admin
+router.get(
+    '/admin/refresh',
+    verificarAdmin,
+    refreshTokenAdmin
+);
+
+// Obtener perfil Admin
+router.get(
+    '/admin/perfil',
+    obtenerPerfilAdmin
 );
 
 

@@ -21,7 +21,6 @@ router.use('/excursiones', excursionesRoutes);
 router.use('/usuarioAdmin', UsuarioAdminRoutes);
 router.use('/compras', comprasRoutes);
 router.use('/detallescompra', detallesCompra);
-router.use('/usuarioAdmin', UsuarioAdminRoutes);
 router.use('/carrito', carritoRoutes);
 router.use('/itemCarrito', itemCarrito);
 router.use('/favorito', Favorito);

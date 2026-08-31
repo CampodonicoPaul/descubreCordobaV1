@@ -99,7 +99,7 @@ export const crearAdministrador = async (req, res) => {
 
         // Verificamos que el email no esté registrado.
         // El modelo también tiene unique, pero validamos antes para un mensaje claro.
-        const existe = await Usuario.findOne({ where: { email } });
+        const existe = await UsuarioAdmin.findOne({ where: { email } });
         if (existe) {
             return res.status(400).json({
                 estado: false,
@@ -215,7 +215,7 @@ export const eliminarAdministrador = async (req, res) => {
 
         // Impedimos que un administrador se elimine a sí mismo,
         // evitando quedar sin acceso al panel.
-        if (req.usuario.id === id) {
+        if (req.usuarioAdmin.id === id) {
             return res.status(400).json({
                 estado: false,
                 mensaje: 'No podés eliminar tu propio usuario',
