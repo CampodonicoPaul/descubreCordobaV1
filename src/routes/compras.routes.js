@@ -1,23 +1,29 @@
 import { Router } from 'express';
+
 import {
     obtener,
     obtenerPorId,
     crear,
     actualizar,
-    eliminar,
 } from '../controllers/compra.controller.js';
 
-import { verificarAdmin } from '../middleware/auth.js';
+import {
+    verificarUsuario,
+    verificarAdmin,
+} from '../middleware/auth.js';
 
 const router = Router();
 
-// Rutas públicas (para la vista principal/e-commerce)
-router.get('/', obtener);
-router.get('/:id', obtenerPorId);
+// Usuario autenticado: ver sus compras.
+router.get('/', verificarUsuario, obtener);
 
-// Rutas protegidas (solo administradores)
-router.post('/', verificarAdmin, crear);
+// Usuario autenticado: ver una de sus compras.
+router.get('/:id', verificarUsuario, obtenerPorId);
+
+// Usuario autenticado: generar una compra desde su carrito.
+router.post('/', verificarUsuario, crear);
+
+// Solo administradores: actualizar el estado de una compra.
 router.put('/:id', verificarAdmin, actualizar);
-router.delete('/:id', verificarAdmin, eliminar);
 
 export default router;
