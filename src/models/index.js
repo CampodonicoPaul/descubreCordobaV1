@@ -14,7 +14,7 @@ import Favorito from './favorito.model.js';
 
 
 Rol.hasMany(Usuario, {
-    foreignKey: 'rolId',
+    foreignKey: 'idRol',
     as: 'UsuarioAdmin',       // alias para acceder a los usuarios de un rol
 });
 UsuarioAdmin.belongsTo(Rol, {

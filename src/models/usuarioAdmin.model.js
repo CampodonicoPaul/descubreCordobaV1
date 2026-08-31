@@ -26,7 +26,7 @@ const UsuarioAdmin = sequelize.define('UsuarioAdmin', {
         allowNull: false,
     },
     idRol: {
-        type: DataTypes.STRING(45),
+        type: DataTypes.INTEGER,
         allowNull: true,
     },
 }, {

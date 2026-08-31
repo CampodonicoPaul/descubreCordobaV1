@@ -19,7 +19,7 @@ import {
     actualizarAdministrador,
     eliminarAdministrador,
     listarRoles,
-} from '../controllers/adminController.js';
+} from '../controllers/usuarioAdmin.controller.js';
 
 // Rutas de lectura: accesibles para ADMIN y OPERADOR.
 // Operador entra gracias a verificarAdmin y puede ver la lista y el detalle.
