@@ -6,8 +6,10 @@
 // no sirve para acceder a rutas de admin, y viceversa.
 
 import { compararPassword, generarToken, JWT_SECRET_CLIENT, JWT_SECRET_ADMIN } from '../utils/auth.js';
-import Usuario from '../models/usuarios.model.js';
-import UsuarioAdmin from '../models/usuarioAdmin.model.js'
+import { Usuario,
+    UsuarioAdmin,
+    Rol,
+} from '../models/index.js';
 
 /**
  * loginCliente
@@ -259,17 +261,10 @@ export const actualizarPerfilCliente = async (req, res) => {
     }
 };
 
-/**
- * loginAdmin
- * Recibe email y contrasenia, valida contra el modelo Usuario y
- * verifica que el rol sea 'administrador'. Devuelve un token JWT
- * con tipo 'admin'.
- */
 export const loginAdmin = async (req, res) => {
     try {
         const { email, contrasenia } = req.body;
 
-        // Validamos que vengan los datos mínimos.
         if (!email || !contrasenia) {
             return res.status(400).json({
                 estado: false,
@@ -277,12 +272,14 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        // Buscamos el administrador directamente (sin include)
         const usuarioAdmin = await UsuarioAdmin.findOne({
-            where: { email }
+            where: { email },
+            include: {
+                model: Rol,
+                as: 'rol'
+            }
         });
 
-        // Si no existe o no tiene el campo rol definido en la columna
         if (!usuarioAdmin || !usuarioAdmin.rol) {
             return res.status(401).json({
                 estado: false,
@@ -290,16 +287,17 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        // Verificamos si la columna rol contiene 'administrador' (o 'admin')
-        if (usuarioAdmin.rol.toLowerCase() !== 'administrador') {
+        if (usuarioAdmin.rol.nombre.toLowerCase() !== 'administrador') {
             return res.status(403).json({
                 estado: false,
                 mensaje: 'Acceso solo para administradores',
             });
         }
 
-        // Comparamos la contraseña enviada con el hash guardado.
-        const passwordValido = await compararPassword(contrasenia, usuarioAdmin.contrasenia);
+        const passwordValido = await compararPassword(
+            contrasenia,
+            usuarioAdmin.contrasenia
+        );
 
         if (!passwordValido) {
             return res.status(401).json({
@@ -308,12 +306,12 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        // Generamos el token pasando tu campo de rol directo
         const token = generarToken({
             id: usuarioAdmin.id,
             email: usuarioAdmin.email,
             tipo: 'admin',
-            rol: usuarioAdmin.rol,
+            idRol: usuarioAdmin.idRol,
+            rol: usuarioAdmin.rol.nombre
         }, JWT_SECRET_ADMIN);
 
         res.json({
@@ -323,15 +321,93 @@ export const loginAdmin = async (req, res) => {
             usuarioAdmin: {
                 id: usuarioAdmin.id,
                 nombre: usuarioAdmin.nombre,
+                apellido: usuarioAdmin.apellido,
                 email: usuarioAdmin.email,
-                rol: usuarioAdmin.rol,
+                idRol: usuarioAdmin.idRol,
+                rol: usuarioAdmin.rol.nombre
             },
         });
+
     } catch (error) {
         console.error('Error en loginAdmin:', error);
+
         res.status(500).json({
             estado: false,
             mensaje: 'Error al iniciar sesión',
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * refreshTokenAdmin
+ * Valida el token del administrador y emite uno nuevo con datos actualizados.
+ * El middleware verificarAdmin ya cargó al usuario en req.usuario,
+ * por lo que podemos confiar en esa información.
+ */
+export const refreshTokenAdmin = async (req, res) => {
+    try {
+        const usuario = req.usuario;
+
+        const token = generarToken({
+            id: usuario.id,
+            email: usuario.email,
+            tipo: 'admin',
+            idRol: usuario.idRol,
+            rolNombre: usuario.rol.nombre,
+        }, JWT_SECRET_ADMIN);
+
+        res.json({
+            estado: true,
+            mensaje: 'Token de administrador validado y renovado',
+            token,
+            usuario: {
+                id: usuario.id,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                email: usuario.email,
+                rol: usuario.rol.nombre,
+                idRol: usuario.idRol,
+            },
+        });
+    } catch (error) {
+        console.error('Error en refreshTokenAdmin:', error);
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al renovar token de administrador',
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * obtenerPerfilAdmin
+ * Devuelve el perfil del administrador logueado.
+ * Excluye el campo password de la respuesta.
+ */
+export const obtenerPerfilAdmin = async (req, res) => {
+    try {
+        const usuario = await UsuarioAdmin.findByPk(req.usuario.id, {
+            include: { model: Rol, as: 'rol' },
+            attributes: { exclude: ['contrasenia'] },
+        });
+
+        if (!usuario) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: 'Administrador no encontrado',
+            });
+        }
+
+        res.json({
+            estado: true,
+            data: usuario,
+        });
+    } catch (error) {
+        console.error('Error al obtener perfil de administrador:', error);
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al obtener perfil de administrador',
             error: error.message,
         });
     }
