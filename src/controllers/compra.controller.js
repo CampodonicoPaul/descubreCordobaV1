@@ -11,13 +11,19 @@ import sequelize from '../config/database.js';
 // GET /compras
 export const obtener = async (req, res) => {
     try {
-        const data = await Compra.findAll();
+        const data = await Compra.findAll({
+            where: {
+                idUsuario: req.usuario.id,
+            },
+        });
+
         res.json({
             estado: true,
             data,
         });
     } catch (error) {
         console.error('Error al obtener compras:', error);
+
         res.status(500).json({
             estado: false,
             mensaje: 'Error al obtener compras',
@@ -30,7 +36,13 @@ export const obtener = async (req, res) => {
 export const obtenerPorId = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const data = await Compra.findByPk(id);
+
+        const data = await Compra.findOne({
+            where: {
+                id,
+                idUsuario: req.usuario.id,
+            },
+        });
 
         if (!data) {
             return res.status(404).json({
@@ -45,6 +57,7 @@ export const obtenerPorId = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al obtener compra:', error);
+
         res.status(500).json({
             estado: false,
             mensaje: 'Error al obtener compra',
