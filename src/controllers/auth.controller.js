@@ -63,7 +63,9 @@ export const loginCliente = async (req, res) => {
             usuario: {
                 id: usuario.id,
                 nombre: usuario.nombre,
+                apellido: usuario.apellido,
                 email: usuario.email,
+                telefono: usuario.telefono,
             },
         });
     } catch (error) {
@@ -283,7 +285,7 @@ export const loginAdmin = async (req, res) => {
             }
         });
 
-        // Verificamos que exista el usuario y tenga un rol
+        // Verificamos que exista el usuarioAdmin y tenga un rol
         if (!usuarioAdmin || !usuarioAdmin.rol) {
             return res.status(401).json({
                 estado: false,
@@ -291,11 +293,14 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        // Verificamos que el rol sea ADMIN
-        if (usuarioAdmin.rol.nombre.toUpperCase() !== 'ADMIN') {
+        // Verificamos que el rol tenga permiso para ingresar
+        // al panel de administración.
+        const rol = usuarioAdmin.rol.nombre.toUpperCase();
+
+        if (!['ADMIN', 'OPERADOR'].includes(rol)) {
             return res.status(403).json({
                 estado: false,
-                mensaje: 'Acceso solo para administradores',
+                mensaje: 'El usuario no tiene permisos para acceder al panel',
             });
         }
 
@@ -325,7 +330,7 @@ export const loginAdmin = async (req, res) => {
             estado: true,
             mensaje: 'Login de administrador exitoso',
             token,
-            usuarioAdmin: {
+            usuario: {
                 id: usuarioAdmin.id,
                 nombre: usuarioAdmin.nombre,
                 apellido: usuarioAdmin.apellido,
