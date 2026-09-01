@@ -24,7 +24,7 @@ const Compra = sequelize.define('Compra', {
     idUsuario: {
         type: DataTypes.INTEGER, 
         allowNull: false
-      }
+    }
 },{ 
     tableName: 'compras',   
     timestamps: false,         // No agregamos columnas createdAt ni updatedAt.

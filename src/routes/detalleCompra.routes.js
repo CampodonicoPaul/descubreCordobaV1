@@ -3,22 +3,16 @@ import { Router } from 'express';
 import {
     obtener,
     obtenerPorId,
-    crear,
-    actualizar,
-    eliminar,
 } from '../controllers/detalleCompra.controller.js';
 
-import { verificarAdmin } from '../middleware/auth.js';
+import { verificarUsuario } from '../middleware/auth.js';
 
 const router = Router();
 
-// Rutas públicas (para la vista principal/e-commerce)
-router.get('/', obtener);
-router.get('/:id', obtenerPorId);
+// Usuario autenticado: ver los detalles de sus propias compras.
+router.get('/', verificarUsuario, obtener);
 
-// Rutas protegidas (solo administradores)
-router.post('/', verificarAdmin, crear);
-router.put('/:id', verificarAdmin, actualizar);
-router.delete('/:id', verificarAdmin, eliminar);
+// Usuario autenticado: ver un detalle de una de sus compras.
+router.get('/:id', verificarUsuario, obtenerPorId);
 
 export default router;

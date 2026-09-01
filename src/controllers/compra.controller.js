@@ -189,10 +189,12 @@ export const crear = async (req, res) => {
     }
 };
 
-// PUT /compra/:id
+// PUT /compras/:id
+// Solo ADMIN: actualizar el estado de una compra.
 export const actualizar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
+
         const compra = await Compra.findByPk(id);
 
         if (!compra) {
@@ -202,44 +204,49 @@ export const actualizar = async (req, res) => {
             });
         }
 
-        await compra.update(req.body);
+        const { estado } = req.body;
+
+        const estadosValidos = [
+            'PENDIENTE',
+            'CONFIRMADA',
+            'CANCELADA',
+        ];
+
+        if (!estado || !estadosValidos.includes(estado)) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'Estado de compra no válido',
+                estadosPermitidos: estadosValidos,
+            });
+        }
+
+        // Una compra confirmada o cancelada no puede volver a modificarse.
+        if (
+            compra.estado === 'CONFIRMADA' ||
+            compra.estado === 'CANCELADA'
+        ) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: `La compra ya está ${compra.estado} y no puede modificarse`,
+            });
+        }
+
+        compra.estado = estado;
+
+        await compra.save();
+
         res.json({
             estado: true,
+            mensaje: 'Estado de compra actualizado correctamente',
             data: compra,
         });
+
     } catch (error) {
         console.error('Error al actualizar compra:', error);
+
         res.status(400).json({
             estado: false,
             mensaje: 'Error al actualizar compra',
-            error: error.message,
-        });
-    }
-};
-
-// DELETE /compras/:id
-export const eliminar = async (req, res) => {
-    try {
-        const id = parseInt(req.params.id, 10);
-        const compra = await Compra.findByPk(id);
-
-        if (!compra) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: 'Compra no encontrada',
-            });
-        }
-
-        await compra.destroy();
-        res.json({
-            estado: true,
-            mensaje: 'Compra eliminada correctamente',
-        });
-    } catch (error) {
-        console.error('Error al eliminar la compra:', error);
-        res.status(500).json({
-            estado: false,
-            mensaje: 'Error al eliminar compra',
             error: error.message,
         });
     }
