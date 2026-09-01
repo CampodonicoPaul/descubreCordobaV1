@@ -101,7 +101,14 @@ export const crear = async (req, res) => {
         if (!carrito) {
             return res.status(403).json({
                 estado: false,
-                mensaje: 'No tenés permiso para modificar este carrito',
+                mensaje: 'Carrito no encontradoo',
+            });
+        }
+
+        if (carrito.estado === 'COMPRADO') {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El carrito ya fue comprado y no puede modificarse',
             });
         }
 
@@ -198,6 +205,13 @@ export const actualizar = async (req, res) => {
             });
         }
 
+        if (itemCarrito.carrito.estado === 'COMPRADO') {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El carrito ya fue comprado y no puede modificarse',
+            });
+        }
+
         const cantidad = Number(req.body.cantidad);
 
         if (!Number.isInteger(cantidad) || cantidad <= 0) {
@@ -267,6 +281,13 @@ export const eliminar = async (req, res) => {
             return res.status(404).json({
                 estado: false,
                 mensaje: 'ItemCarrito no encontrado',
+            });
+        }
+
+        if (itemCarrito.carrito.estado === 'COMPRADO') {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El carrito ya fue comprado y no puede modificarse',
             });
         }
 

@@ -63,18 +63,36 @@ export const obtenerPorId = async (req, res) => {
 
 
 // POST /carritos
-// Crea un carrito para el usuario autenticado.
+// Crea un carrito ACTIVO para el usuario autenticado.
+// Solo puede existir un carrito ACTIVO por usuario.
 export const crear = async (req, res) => {
     try {
+        const carritoActivo = await Carrito.findOne({
+            where: {
+                idUsuario: req.usuario.id,
+                estado: 'ACTIVO',
+            },
+        });
+
+        if (carritoActivo) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'Ya tenés un carrito activo',
+            });
+        }
+
         const data = await Carrito.create({
-            fechaCreacion: req.body.fechaCreacion,
+            fechaCreacion: new Date(),
             idUsuario: req.usuario.id,
+            estado: 'ACTIVO',
         });
 
         res.status(201).json({
             estado: true,
+            mensaje: 'Carrito creado correctamente',
             data,
         });
+
     } catch (error) {
         console.error('Error al crear carrito:', error);
 
@@ -88,7 +106,7 @@ export const crear = async (req, res) => {
 
 
 // PUT /carritos/:id
-// Actualiza únicamente un carrito perteneciente al usuario autenticado.
+// Solo permite modificar un carrito ACTIVO del usuario autenticado.
 export const actualizar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
@@ -107,14 +125,23 @@ export const actualizar = async (req, res) => {
             });
         }
 
+        if (carrito.estado === 'COMPRADO') {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El carrito ya fue comprado y no puede modificarse',
+            });
+        }
+
         await carrito.update({
             fechaCreacion: req.body.fechaCreacion,
         });
 
         res.json({
             estado: true,
+            mensaje: 'Carrito actualizado correctamente',
             data: carrito,
         });
+
     } catch (error) {
         console.error('Error al actualizar carrito:', error);
 
@@ -128,7 +155,7 @@ export const actualizar = async (req, res) => {
 
 
 // DELETE /carritos/:id
-// Elimina únicamente un carrito perteneciente al usuario autenticado.
+// Solo permite eliminar un carrito ACTIVO del usuario autenticado.
 export const eliminar = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
@@ -147,12 +174,20 @@ export const eliminar = async (req, res) => {
             });
         }
 
+        if (carrito.estado === 'COMPRADO') {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'El carrito ya fue comprado y no puede eliminarse',
+            });
+        }
+
         await carrito.destroy();
 
         res.json({
             estado: true,
             mensaje: 'Carrito eliminado correctamente',
         });
+
     } catch (error) {
         console.error('Error al eliminar carrito:', error);
 
