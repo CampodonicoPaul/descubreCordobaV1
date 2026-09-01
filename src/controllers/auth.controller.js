@@ -83,7 +83,7 @@ export const loginCliente = async (req, res) => {
  */
 export const registrarUsuario = async (req, res) => {
     try {
-        const { nombre, apellido, email, contrasenia } = req.body;
+        const { nombre, apellido, email, contrasenia, telefono } = req.body;
 
         // Validamos que vengan los datos mínimos.
         if (!nombre || !email || !contrasenia) {
@@ -104,7 +104,7 @@ export const registrarUsuario = async (req, res) => {
         }
 
         // Creamos el usuario. El hook beforeCreate encripta la contraseña.
-        const usuario = await Usuario.create({ nombre, apellido, email, contrasenia });
+        const usuario = await Usuario.create({ nombre, apellido, email, contrasenia, telefono });
 
         // Generamos el token con datos públicos del usuario.
         const token = generarToken({
@@ -122,6 +122,7 @@ export const registrarUsuario = async (req, res) => {
                 nombre: usuario.nombre,
                 apellido: usuario.apellido,
                 email: usuario.email,
+                telefono: usuario.telefono,
             },
         });
     } catch (error) {
@@ -154,11 +155,12 @@ export const refreshTokenCliente = async (req, res) => {
             mensaje: 'Token validado y renovado correctamente',
             token,
             usuario: {
-                id: usuario.id,
-                nombre: usuario.nombre,
-                apellido: usuario.apellido,
-                email: usuario.email,
-            },
+                    id: usuario.id,
+                    nombre: usuario.nombre,
+                    apellido: usuario.apellido,
+                    email: usuario.email,
+                    telefono: usuario.telefono,
+                },
         });
     } catch (error) {
         console.error('Error en refreshToken usuario:', error);
