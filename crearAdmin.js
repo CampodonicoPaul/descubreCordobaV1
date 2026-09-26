@@ -10,17 +10,12 @@ const crearAdmin = async () => {
 
         console.log('Conectado a la base de datos.');
 
-        const rol = await Rol.findOne({
-            where: {
-                nombre: 'ADMIN'
-            }
+        // 1. Buscamos el rol o lo creamos si no existe
+        let [rol] = await Rol.findOrCreate({
+            where: { nombre: 'ADMIN' },
+            defaults: { descripcion: 'Administrador del sistema' }
         });
-
-        if (!rol) {
-            console.log('No existe el rol administrador.');
-            return;
-        }
-
+        
         const adminExistente = await UsuarioAdmin.findOne({
             where: {
                 email: 'admin@gmail.com'

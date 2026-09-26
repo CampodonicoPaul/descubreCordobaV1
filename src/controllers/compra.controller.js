@@ -114,7 +114,10 @@ export const crear = async (req, res) => {
         for (const item of items) {
             const excursion = await Excursion.findByPk(
                 item.idExcursion,
-                { transaction }
+                {
+                    transaction,
+                    lock: transaction.LOCK.UPDATE,
+                }
             );
 
             if (!excursion) {
@@ -126,6 +129,21 @@ export const crear = async (req, res) => {
             const precioUnitario = Number(excursion.precio);
             const cantidad = Number(item.cantidad);
 
+            if (!Number.isInteger(cantidad) || cantidad <= 0) {
+                throw new Error(
+                    `La cantidad para la excursión ${excursion.id} no es válida`
+                );
+            }
+
+            if (
+                excursion.cupos !== null &&
+                cantidad > Number(excursion.cupos)
+            ) {
+                throw new Error(
+                    `No hay suficientes cupos para "${excursion.nombre}". Disponibles: ${excursion.cupos}`
+                );
+            }
+
             total += precioUnitario * cantidad;
 
             detalles.push({
@@ -133,6 +151,15 @@ export const crear = async (req, res) => {
                 cantidad,
                 precioUnitario,
             });
+
+            if (excursion.cupos !== null) {
+                await excursion.update(
+                    {
+                        cupos: Number(excursion.cupos) - cantidad,
+                    },
+                    { transaction }
+                );
+            }
         }
 
         // 4. Creamos la compra.
