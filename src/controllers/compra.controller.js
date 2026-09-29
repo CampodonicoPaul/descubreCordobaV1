@@ -4,6 +4,7 @@ import {
     Carrito,
     ItemCarrito,
     Excursion,
+    Usuario,
 } from '../models/index.js';
 
 import sequelize from '../config/database.js';
@@ -23,6 +24,33 @@ export const obtener = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al obtener compras:', error);
+
+        res.status(500).json({
+            estado: false,
+            mensaje: 'Error al obtener compras',
+            error: error.message,
+        });
+    }
+};
+
+// GET /compras/admin
+export const obtenerTodas = async (req, res) => {
+    try {
+        const data = await Compra.findAll({
+            include: [{
+                model: Usuario,
+                as: 'usuario',
+                attributes: ['id', 'nombre', 'apellido', 'email'],
+            }],
+            order: [['fechaCompra', 'DESC']],
+        });
+
+        res.json({
+            estado: true,
+            data,
+        });
+    } catch (error) {
+        console.error('Error al obtener todas las compras:', error);
 
         res.status(500).json({
             estado: false,

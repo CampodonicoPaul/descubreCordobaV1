@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import {
     obtener,
+    obtenerTodas,
     obtenerPorId,
     crear,
     actualizar,
@@ -10,12 +11,16 @@ import {
 import {
     verificarUsuario,
     verificarAdmin,
+    verificarRolAdmin,
 } from '../middleware/auth.js';
 
 const router = Router();
 
 // Usuario autenticado: ver sus compras.
 router.get('/', verificarUsuario, obtener);
+
+// Administradores: consultar todas las compras.
+router.get('/admin', verificarAdmin, obtenerTodas);
 
 // Usuario autenticado: ver una de sus compras.
 router.get('/:id', verificarUsuario, obtenerPorId);
@@ -24,6 +29,6 @@ router.get('/:id', verificarUsuario, obtenerPorId);
 router.post('/', verificarUsuario, crear);
 
 // Solo administradores: actualizar el estado de una compra.
-router.put('/:id', verificarAdmin, actualizar);
+router.put('/:id', verificarAdmin, verificarRolAdmin, actualizar);
 
 export default router;
