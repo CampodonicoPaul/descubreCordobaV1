@@ -1,19 +1,19 @@
 import { Router } from 'express';
 import {
     obtenerPorUsuario,
-    obtenerPorId,
     crear,
     eliminar
 } from '../controllers/favorito.controller.js'; 
+import { verificarUsuario } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/usuario/:idUsuario', obtenerPorUsuario);
+router.use(verificarUsuario);
 
-router.get('/:idUsuario/:idExcursion', obtenerPorId);
+router.get('/', obtenerPorUsuario);
 
 router.post('/', crear);
 
-router.delete('/:idUsuario/:idExcursion', eliminar);
+router.delete('/:idExcursion', eliminar);
 
 export default router;

@@ -1,11 +1,12 @@
-import {Favorito} from '../models/index.js';
+import { Favorito, Excursion } from '../models/index.js';
 
-// GET /favorito/usuario/:idUsuario
+// GET /favorito
 export const obtenerPorUsuario = async (req, res) => {
     try {
-        const idUsuario = parseInt(req.params.idUsuario, 10);
+        const idUsuario = req.usuario.id;
         const data = await Favorito.findAll({
-            where: { idUsuario }
+            where: { idUsuario },
+            include: [{ model: Excursion, as: 'excursion' }],
         });
 
         res.json({
@@ -22,47 +23,16 @@ export const obtenerPorUsuario = async (req, res) => {
     }
 };
 
-// GET /favorito/:idUsuario/:idExcursion
-export const obtenerPorId = async (req, res) => {
-    try {
-        const idUsuario = parseInt(req.params.idUsuario, 10);
-        const idExcursion = parseInt(req.params.idExcursion, 10);
-
-        const data = await Favorito.findOne({
-            where: { idUsuario, idExcursion }
-        });
-
-        if (!data) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: 'Favorito no encontrado',
-            });
-        }
-
-        res.json({
-            estado: true,
-            data,
-        });
-    } catch (error) {
-        console.error('Error al obtener favorito:', error);
-        res.status(500).json({
-            estado: false,
-            mensaje: 'Error al obtener favorito',
-            error: error.message,
-        });
-    }
-};
-
 // POST /favorito
 export const crear = async (req, res) => {
     try {
-        const idUsuario = parseInt(req.body.idUsuario, 10);
+        const idUsuario = req.usuario.id;
         const idExcursion = parseInt(req.body.idExcursion, 10);
 
-        if (!idUsuario || !idExcursion) {
+        if (!Number.isInteger(idExcursion) || idExcursion < 1) {
             return res.status(400).json({
                 estado: false,
-                mensaje: 'Debes proporcionar idUsuario e idExcursion válidos',
+                mensaje: 'Debes proporcionar un idExcursion válido',
             });
         }
 
@@ -90,11 +60,18 @@ export const crear = async (req, res) => {
     }
 };
 
-// DELETE /favorito/:idUsuario/:idExcursion
+// DELETE /favorito/:idExcursion
 export const eliminar = async (req, res) => {
     try {
-        const idUsuario = parseInt(req.params.idUsuario, 10);
+        const idUsuario = req.usuario.id;
         const idExcursion = parseInt(req.params.idExcursion, 10);
+
+        if (!Number.isInteger(idExcursion) || idExcursion < 1) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: 'Debes proporcionar un idExcursion válido',
+            });
+        }
 
         const filasBorradas = await Favorito.destroy({
             where: { idUsuario, idExcursion }
